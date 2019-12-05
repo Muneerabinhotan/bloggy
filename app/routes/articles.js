@@ -17,7 +17,7 @@ router.get('/api/articles', (req,res) => {
     Article.find()
     // Return all Articles as an array
     .then((articles) =>{
-        res.status(200).json({ message: 'Get All Articles'});
+        res.status(200).json({ articles: articles });
     })
     // catch any errors that might occur
     .catch((error) =>{
