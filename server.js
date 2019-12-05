@@ -21,6 +21,11 @@ const app = express();
 // Define a PORT for the API to run on 
 const port = process.env.PORT || 5000; // if the env has a number use it if not use 5000 || proce... comes from node
 
+    /*** MIDDLEWARE ***/
+// Add `bodyParser` middleware which will parse JSON requests into JS objects before they reach the route files.
+
+// The method `.use` sets up middleware for the Express application
+app.use(express.json());
 
     /*** ROUTES ***/
 // Mount imported Routers

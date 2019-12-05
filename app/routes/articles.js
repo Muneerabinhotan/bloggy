@@ -38,6 +38,19 @@ router.get('/api/articles', (req,res) => {
  * URI:         /api/articles
  * Description: Create a new Article
 */
+router.post('/api/articles', (req,res) =>{
+    Article.create(req.body.article)
+    // on a successful `create` action, respond with 201
+    // HTTP status and the content of the new article.
+    .then((newArticle) =>{
+        res.status(201).json({ article: newArticle });
+    })
+    // Catch any errors that might occur
+    .catch((error) => {
+        res.status(500).json({ error: error });
+    })
+});
+
 
 /** DOCUMENTATION **
  * Action:      UPDATE
@@ -53,6 +66,31 @@ router.get('/api/articles', (req,res) => {
  * URI:         /api/articles/5d44d6f878989f484
  * Description: Delete an Article by Article ID
 */
+router.delete('/api/articles/:id', (req,res) => {
+    Article.findById(req.params.id)
+    .then((article) =>{
+        if(article){
+            // Pass the result of Mongoose's `.delete` method to the next `.then`
+            return article.remove();}
+            else{
+            // If we couldn't find a document with the matching ID || speceliazed errors
+            res.status(404).json({
+                error: {
+                    name: 'DocumentNotFoundError',
+                    message: 'The provided ID doesn\'t match any documents'
+                }
+            });
+        }
+    })
+    .then(() =>{
+        // If the deletion succeeded, return 204 "no content" and no JSON
+        res.status(204).end();
+    })
+    // Catch any errors that might occur || generic errors
+    .catch((error) =>{
+        res.status(500).json({ error: error });
+    })
+});
 
 // Export the Router so we can use it in the server.js file
 module.exports = router;
