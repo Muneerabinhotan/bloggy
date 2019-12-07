@@ -31,6 +31,28 @@ router.get('/api/articles', (req,res) => {
  * URI:         /api/articles/5d44d6f878989f484
  * Description: Get an Article by Article ID
 */
+router.get('/api/articles/:id', (req, res) => {
+    Article.findById(req.params.id)
+    .then((article) => {
+      if (article) {
+        // Pass the result of Mongoose's `.get` method to the next `.then`
+        res.status(200).send(article);
+      } else {
+        // If we couldn't find a document with matching ID || speciliazed errors
+        res.status(404).json({
+          error: {
+            name: 'DocumentNotFoundError',
+            message: 'The provided ID doesn\'t match any document'
+          }
+        });
+      }
+    })
+    // Catch any errors that might occur || generic errors
+    .catch((error) => {
+      res.status(500).json({ error: error });
+    })
+  });
+
 
 /** DOCUMENTATION **
  * Action:      CREATE
@@ -51,14 +73,37 @@ router.post('/api/articles', (req,res) =>{
     })
 });
 
-
 /** DOCUMENTATION **
  * Action:      UPDATE
  * Method:      PATCH "PATCH for multiple feild PUT for one feild"
  * URI:         /api/articles/5d44d6f878989f484
  * Description: Update an Article by Article ID
 */
-
+router.patch('/api/articles/:id', (req, res) => {
+    Article.findById(req.params.id)
+      .then((article) => {
+        if (article) {
+         // Pass the result of Mongoose's `.update` method to the next `.then`
+          return article.update(req.body.article)
+        } else {
+          // If we couldn't find a document with matching ID || specilazied errors
+          res.status(404).json({
+            error: {
+              name: 'DocumentNotFoundError',
+              message: 'The provided ID doesn\'t match any document'
+            }
+          })
+        }
+      })
+      .then((article) => {
+        // If succeeded, return 204 and no JSON
+        res.status(200).send(article);
+      })
+      // Catch any errors that might occur || generic errors
+      .catch((error) => {
+        res.status(500).json({ error: error });
+      })
+  });
 
 /** DOCUMENTATION **
  * Action:      DESTROY
