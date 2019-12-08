@@ -18,7 +18,8 @@ const articleSchema = new mongoose.Schema({
 
 // Compile our Model based on the Schema
 const Article = mongoose.model('Article', articleSchema);
+const Comment = mongoose.model('Comment', commentSchema)
 
 
 // Export our Model for use
-module.exports = Article;
+module.exports = {Article, Comment}
