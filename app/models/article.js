@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 
 const commentSchema = new mongoose.Schema({
-    body: {type: String, default: 'You are a great writer'}
+    body: {type: String, default: 'You\'re the best man'}
 },{timestamps:true})
 
 // Define the Article Schema
