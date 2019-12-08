@@ -21,5 +21,5 @@ const Article = mongoose.model('Article', articleSchema);
 const Comment = mongoose.model('Comment', commentSchema)
 
 
-// Export our Model for use
+// Export our Model for use.
 module.exports = {Article, Comment}
