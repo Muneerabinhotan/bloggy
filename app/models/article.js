@@ -1,6 +1,10 @@
 // Require necessary NPM Packages
 const mongoose = require('mongoose');
 
+const commentSchema = new mongoose.Schema({
+    body: {type: String, default: 'You are a great writer'}
+},{timestamps:true})
+
 // Define the Article Schema
 const articleSchema = new mongoose.Schema({
     title:{type: String, required: true},
