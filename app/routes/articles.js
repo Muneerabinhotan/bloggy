@@ -2,7 +2,8 @@
 const express = require('express');
 
 // Require Mongoose Model for Article
-const Article = require('../models/article');
+const Article = require('../models/article').Article
+const Comment = require('../models/article').Comment
 
 // Instantiate a Router (mini app that only handles routes)
 const router = express.Router();
@@ -25,6 +26,34 @@ router.get('/api/articles', (req,res) => {
     })
 });
 
+/** DOCUMENTATION **
+INDEX
+*/
+
+router.get('/api/articles/:articleId/comments', (req, res)=>{
+    Article.findById(req.params.articleId)
+    .then((article)=>{
+        if(article){
+            // Pass the result of Mongoose's 'get' method to the next 'then'
+            return res.status(200).json({article: article.comments})
+        }
+        else {
+            res.status(404).json({
+                error: {
+                    name: 'DocumentNotFound',
+                    message: 'The provided ID doesnt match any documents'
+                }
+            })
+        }
+    })
+    .then(()=>{
+        // If the update succeeded, return 204 and no JSON
+        res.status(204).end();
+    })
+    .catch((error)=>{
+        res.status(500).json({error:error})
+    })
+})
 /** DOCUMENTATION **
  * Action:      SHOW
  * Method:      GET
@@ -53,6 +82,35 @@ router.get('/api/articles/:id', (req, res) => {
     })
   });
 
+/** DOCUMENTATION **
+SHOW
+
+*/
+
+router.get('/api/articles/:articleId/comments/:id', (req, res)=>{
+    Article.findById(req.params.articleId)
+    .then((article)=>{
+        if(article){
+            // Pass the result of Mongoose's 'get' method to the next 'then'
+            return res.status(200).json({article: article.comments.id(req.params.id)})
+        }
+        else {
+            res.status(404).json({
+                error: {
+                    name: 'DocumentNotFound',
+                    message: 'The provided ID doesnt match any documents'
+                }
+            })
+        }
+    })
+    .then(()=>{
+        // If the update succeeded, return 204 and no JSON
+        res.status(204).end();
+    })
+    .catch((error)=>{
+        res.status(500).json({error:error})
+    })
+})
 
 /** DOCUMENTATION **
  * Action:      CREATE
@@ -71,6 +129,21 @@ router.post('/api/articles', (req,res) =>{
     .catch((error) => {
         res.status(500).json({ error: error });
     })
+});
+
+/** DOCUMENTATION **
+CREATE
+*/
+
+router.post('/api/articles/:articleId/comments', (req, res)=>{
+    const newComment = new Comment({body: req.body.commentText})
+
+    Article.findById(req.params.articleId, (err, article)=>{
+        article.comments.push(newComment)
+        article.save((err, savedArticle)=>{
+            res.json(newComment)
+        });
+    });
 });
 
 /** DOCUMENTATION **
@@ -106,6 +179,17 @@ router.patch('/api/articles/:id', (req, res) => {
   });
 
 /** DOCUMENTATION **
+UPDATE
+*/
+  router.patch('/api/articles/:articleId/comments/:id', (req, res)=>{
+    const articleId = req.params.articleId
+    const commentId = req.params.id
+    Article.findById(articleId, (err, article)=>{
+        comment = article.comments.id(commentId);
+        comment.body = req.body.commentText;
+    })
+})
+/** DOCUMENTATION **
  * Action:      DESTROY
  * Method:      DELETE
  * URI:         /api/articles/5d44d6f878989f484
@@ -137,5 +221,35 @@ router.delete('/api/articles/:id', (req,res) => {
     })
 });
 
+/** DOCUMENTATION **
+DESTROY
+*/
+router.delete('/api/articles/:articleId/comments/:id', (req, res)=>{
+    Article.findById(req.params.articleId)
+    .then((article)=>{
+        if(article){
+            // Pass the result of Mongoose's 'delete' method to the next 'then'
+            article.comments.id(req.params.id).remove()
+            article.save()
+            return
+
+        }
+        else {
+            res.status(404).json({
+                error: {
+                    name: 'DocumentNotFound',
+                    message: 'The provided ID doesnt match any documents'
+                }
+            })
+        }
+    })
+    .then(()=>{
+        // If the deletion succeeded, return 204 and no JSON
+        res.status(204).end();
+    })
+    .catch((error)=>{
+        res.status(500).json({error:error})
+    })
+})
 // Export the Router so we can use it in the server.js file
 module.exports = router;
